@@ -49,7 +49,10 @@ def status(player):
     status = {
         "name": player.name,
         "metal": player.metal,
-        "crystal": player.crystal
+        "crystal": player.crystal,
+        "energy": player.energy,
+        "Metal Mine Level": player.metalMine.level,
+        "Crystal Mine Level": player.crystalMine.level,
     }
     return json.dumps(status)
 
@@ -65,26 +68,29 @@ class Mine:
         # 1 is available, 0 is out of comission (destroyed), 2 is upgrading (cannot be upgraded again)
         self.status = 0
 
-    def upgrade(self, Player):
-        Player.metal -= self.upgradeMetalCost
-        Player.crystal -= self.updateCrystalCost
+    def upgrade(self, player):
+        if player.metal < self.upgradeMetalCost or player.crystal < self.updateCrystalCost:
+            return False
+        player.metal -= self.upgradeMetalCost
+        player.crystal -= self.updateCrystalCost
         self.level += 1
-        self.rate = self.rate
-        self.upgradeFinishTime = dt.datetime.today() + self.upgradeTime
+        self.rate = 1.3 * self.rate
+        self.upgradeFinishTime = dt.datetime.today() + dt.timedelta(seconds = self.upgradeTime)
         self.upgradeMetalCost = 100 * self.level
-        self.upgradeMetalCost = 75 * self.level
+        self.upgradeCrystalCost = 75 * self.level
         self.energyConsumption = 5 * self.level
         self.upgradeTime = 10 * self.level
+        return True
 
 
-class MetalMine:
+class MetalMine(Mine):
     def __init__(self):
-        Mine.__init__(self, 50, 1, "Metal")
+        super().__init__(50, 1, "Metal")
 
 
-class CrystalMine:
+class CrystalMine(Mine):
     def __init__(self, level=1):
-        Mine.__init__(self, 35, 1, "Crystal")
+        super().__init__(35, 1, "Crystal")
 
 
 class Ship:
@@ -111,5 +117,5 @@ class Player:
         return f"name: {self.name}, id: {self.id}"
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

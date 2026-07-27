@@ -20,8 +20,6 @@ def hello_world():
 
 @app.route('/player', methods=["POST"])
 def newPlayer():
-    # name = request.form.get("name")
-    # id = request.form.get("id", type=int)
     data = request.get_json()
     name = data.get('name')
     id = int(data.get('id'))
@@ -33,9 +31,32 @@ def newPlayer():
     newPlayer = main.Player(name, id)
     players[id] = newPlayer
     return jsonify({
-        "status": "success",
+        "status": "Success",
         "recieved": f"id: {id}, name: {name}"
     })
+
+
+@app.route('/upgradeMine', methods=["POST"])
+def upgradeMine():
+    data = request.get_json()
+    id = int(data.get('id'))
+    mine = data.get('mine')
+    idCheck(id)
+    player = players.get(id)
+    if mine.lower() == "m" or mine.lower() == "metal":
+        success = player.metalMine.upgrade(player)
+    if mine.lower() == "c" or mine.lower() == "crystal":
+        success = player.crystalMine.upgrade(player)
+    if success:
+        return jsonify({
+            "status": "Success",
+            "recieved": f"Upgraded the {mine} mine for player {id}"
+        })
+    else:
+        return jsonify({
+            "status": "FAILED",
+            "recieved": f"Player {id} did not have enough resources to upgrade the {mine} mine"
+        })
 
 
 @app.route('/status')
@@ -59,6 +80,14 @@ def dump():
         first = False
     bigstring += "]"
     return bigstring
+
+
+def idCheck(playerID):
+    if playerID not in players:
+        return jsonify({
+            "status": "FAILURE",
+            "recieved": f"ID: {playerID} not found"
+        })
 
 
 if __name__ == '__main__':
