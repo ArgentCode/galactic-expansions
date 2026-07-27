@@ -37,21 +37,21 @@ def tick(player):
     player.metal += round(minutes * player.metalMine.rate)
     # Check upgrades?
 
+def print_status(player):
+     print("Metal:", player.metal, " Crystal:",
+           player.crystal, " Energy:", player.energy)
+     print("Metal Mine:", player.metalMine.level,
+           "Crystal Mine:", player.crystalMine.level)
+     print("Current upgrades....")
+
 
 def status(player):
-    #  print("Metal:", player.metal, " Crystal:",
-    #        player.crystal, " Energy:", player.energy)
-    #  print("Metal Mine:", player.metalMine.level,
-    #        "Crystal Mine:", player.crystalMine.level)
-    #  print("Current upgrades....")
     status = {
         "name": player.name,
         "metal": player.metal,
         "crystal": player.crystal
     }
     return json.dumps(status)
-    # TODO: Return a nice json object
-    # something like {metal: 123, crystal, 456, ...}
 
 class Mine:
     def __init__(self, rate, level, name):
