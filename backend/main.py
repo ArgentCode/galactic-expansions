@@ -29,20 +29,50 @@ def main():
 
 def tick(player):
     now = dt.datetime.now()
-    timeDelta = now - player.lastTick
+    lastTick = player.lastTick
+    timeDelta = now - lastTick
     player.lastTick = now
     minutes = timeDelta.total_seconds()
+    # metal
+    # if mine is in normal conditions, update materials. Else, upgrade mine and calculate the
+    # old and new rates
+    if player.metalMine.lastUpgradeTime < lastTick or player.metalMine.lastUpgradeTime > now:
+        player.metal += round(minutes * player.metalMine.rate)
+    else:
+        oldRateTime = player.metalMine.lastUpgradeTime - lastTick
+        minutes = oldRateTime.total_seconds()
+        player.metal += round(minutes * player.metalMine.rate)
+        player.metalMine.upgradeFinalise(player)
+        newRateTime = now - player.metalMine.lastUpgradeTime
+        minutes = newRateTime.total_seconds()
+        player.metal += round(minutes * player.metalMine.rate)
+
+    #crystal
+    if player.crystalMine.lastUpgradeTime < lastTick or player.crystalMine.lastUpgradeTime > now:
+        player.crystal += round(minutes * player.crystalMine.rate)
+    else:
+        oldRateTime = player.crystalMine.lastUpgradeTime - lastTick
+        minutes = oldRateTime.total_seconds()
+        player.crystal += round(minutes * player.crystalMine.rate)
+        player.crystalMine.upgradeFinalise(player)
+        newRateTime = now - player.crystalMine.lastUpgradeTime
+        minutes = newRateTime.total_seconds()
+        player.crystal += round(minutes * player.crystalMine.rate)
+
+    # ships?
+
     print(minutes, " Time has passed")
     player.crystal += round(minutes * player.crystalMine.rate)
     player.metal += round(minutes * player.metalMine.rate)
     # Check upgrades?
 
+
 def print_status(player):
-     print("Metal:", player.metal, " Crystal:",
-           player.crystal, " Energy:", player.energy)
-     print("Metal Mine:", player.metalMine.level,
-           "Crystal Mine:", player.crystalMine.level)
-     print("Current upgrades....")
+    print("Metal:", player.metal, " Crystal:",
+          player.crystal, " Energy:", player.energy)
+    print("Metal Mine:", player.metalMine.level,
+          "Crystal Mine:", player.crystalMine.level)
+    print("Current upgrades....")
 
 
 def status(player):
@@ -56,6 +86,7 @@ def status(player):
     }
     return json.dumps(status)
 
+
 class Mine:
     def __init__(self, rate, level, name):
         self.level = level
@@ -63,24 +94,29 @@ class Mine:
         self.rate = rate
         self.energyConsumption = 5 * self.level
         self.upgradeMetalCost = 100 * self.level
-        self.updateCrystalCost = 75 * self.level
+        self.upgradeCrystalCost = 75 * self.level
         self.upgradeTime = 10 * self.level
         # 1 is available, 0 is out of comission (destroyed), 2 is upgrading (cannot be upgraded again)
         self.status = 0
+        self.lastUpgradeTime = dt.datetime.now()
 
-    def upgrade(self, player):
-        if player.metal < self.upgradeMetalCost or player.crystal < self.updateCrystalCost:
+    def upgradeInitiate(self, player):
+        if (player.metal < self.upgradeMetalCost
+            or player.crystal < self.upgradeCrystalCost
+                or self.lastUpgradeTime > dt.datetime.now()):
             return False
         player.metal -= self.upgradeMetalCost
-        player.crystal -= self.updateCrystalCost
-        self.level += 1
-        self.rate = 1.3 * self.rate
-        self.upgradeFinishTime = dt.datetime.today() + dt.timedelta(seconds = self.upgradeTime)
+        player.crystal -= self.upgradeCrystalCost
+        self.lastUpgradeTime = dt.datetime.now() + dt.timedelta(seconds=self.upgradeTime)
         self.upgradeMetalCost = 100 * self.level
         self.upgradeCrystalCost = 75 * self.level
         self.energyConsumption = 5 * self.level
         self.upgradeTime = 10 * self.level
         return True
+
+    def upgradeFinalise(self, player):
+        self.level += 1
+        self.rate = 1.3 * self.rate
 
 
 class MetalMine(Mine):

@@ -44,9 +44,9 @@ def upgradeMine():
     idCheck(id)
     player = players.get(id)
     if mine.lower() == "m" or mine.lower() == "metal":
-        success = player.metalMine.upgrade(player)
+        success = player.metalMine.upgradeInitiate(player)
     if mine.lower() == "c" or mine.lower() == "crystal":
-        success = player.crystalMine.upgrade(player)
+        success = player.crystalMine.upgradeInitiate(player)
     if success:
         return jsonify({
             "status": "Success",
@@ -55,7 +55,7 @@ def upgradeMine():
     else:
         return jsonify({
             "status": "FAILED",
-            "recieved": f"Player {id} did not have enough resources to upgrade the {mine} mine"
+            "recieved": f"Player {id} failed to upgrade the {mine} mine"
         })
 
 
