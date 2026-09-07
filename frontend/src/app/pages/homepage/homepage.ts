@@ -1,22 +1,29 @@
 import { Component, inject } from '@angular/core';
-import { ApiService } from '../../services/data.service';
 import { ResourceView } from '../../components/ResourcesView/ResourceView.component';
+import { NavMenu } from '../../components/NavMenu/NavMenu.component';
+import { PlayerStatusService } from '../../services/player-status.service';
 
+// This should probably be renamed 'Overview'
 @Component({
-  imports: [ResourceView],
+  imports: [ResourceView, NavMenu],
   selector: 'app-homepage',
   styleUrl: './homepage.css',
   templateUrl: './homepage.html',
 })
 export class Homepage {
 
-  private apiService = inject(ApiService);
+  private statusService = inject(PlayerStatusService);
 
-  ngOnInit(): void {
-    
-  }
+  ngOnInit(): void {}
 
   handleClick() {
-    console.log(this.apiService.fetchData(1));
+    this.statusService.getPlayerStatus(1).subscribe({
+      next: (data) => {
+        console.log(data)
+      },
+      error: (err) => {
+        console.error('Failed to load status', err);
+      }
+    })
   }
 }

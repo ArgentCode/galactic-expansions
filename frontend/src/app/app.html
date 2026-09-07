@@ -1,1 +1,15 @@
-<router-outlet />
+<div class="wrapper">
+    <div class="header">
+        <!-- <ResourceView [metal]="{{playerStatus?.metal ?? 0}}" [crystal]="1" [deut]="2" [energy]="3" /> -->
+        <ResourceView [playerStatus]="playerStatus()" />
+    </div>
+    
+    <div>
+        <div class="navmenu" style="float:left">
+            <NavMenu />
+        </div>
+        <div class="content">
+            <router-outlet />
+        </div>
+    </div>
+</div>

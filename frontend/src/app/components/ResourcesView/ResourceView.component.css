@@ -1,0 +1,22 @@
+.container { 
+    display: flex;
+    justify-content: space-between;
+    gap: 30px
+}
+
+.item {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.item img {
+    width: 100%;
+    height: auto;
+}
+
+.item p {
+    text-align: center;
+    margin-top: -1px;
+}

@@ -1,0 +1,12 @@
+.nav-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-item {
+    margin-bottom: 10px;
+    
+    button {
+        width: 100%;
+    }
+}

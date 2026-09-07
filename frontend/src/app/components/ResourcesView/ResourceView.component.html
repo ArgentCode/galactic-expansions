@@ -1,12 +1,19 @@
-<div id="resources">
-    <!-- Figure out how to lay this out horizontally -->
-    <div id="metal">
-        Metal: {{ metal() }}
+<div class="container" id="resources">
+    <div class="item" id="metal">
+        <img src="images/Metal_ore.webp"/>
+        <p>{{ playerStatus().metal }}</p>
     </div>
-    <div id="crystal">
-        Crystal: {{ crystal() }}
+    <div class="item" id="crystal">
+        <img src="images/Crystal.webp"/>
+        <p>{{ playerStatus().crystal }}</p>
     </div>
-    <div id="deut">
-        Deut: {{ deut() }}
+    <div class="item" id="deut">
+        <img src="images/Deuterium.webp"/>
+        <p>0</p>
+        <!-- unsupported currently... <p>{{ playerStatus().deut() }}</p> -->
+    </div>
+    <div class="item" id="energy">
+        <img src="images/Deuterium.webp"/>
+        <p>{{ playerStatus().energy }}</p>
     </div>
 </div>

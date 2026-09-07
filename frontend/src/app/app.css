@@ -1,0 +1,21 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 80%;
+    margin-left: 10%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.navmenu {
+    margin-right: 10px;
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+}

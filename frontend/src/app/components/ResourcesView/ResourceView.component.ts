@@ -1,12 +1,12 @@
 import { Component, input } from '@angular/core';
+import { PlayerStatus } from '../../models/player-status.dto';
 
 @Component({
   imports: [],
   selector: 'ResourceView',
+  styleUrl: './ResourceView.component.css',
   templateUrl: './ResourceView.component.html',
 })
 export class ResourceView {
-    metal = input.required<number>();
-    crystal = input.required<number>();
-    deut = input.required<number>();
+    playerStatus = input.required<PlayerStatus>()
 }
