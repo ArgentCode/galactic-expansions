@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable({
@@ -20,14 +20,19 @@ export class ApiService {
   /**
    * Fetches data from a Flask endpoint (e.g., /api/data)
    */
-  async fetchData() {
+  async fetchData(playerId: number) {
     this.loading.set(true);
     this.error.set(null);
 
     try {
+      // Define custom headers
+      const headers = new HttpHeaders({
+        'player': playerId
+      });
+      
       // firstValueFrom converts the Observable to a clean async/await Promise
       const response = await firstValueFrom(
-        this.http.get<any>(`${this.baseUrl}`)
+        this.http.get<any>(`${this.baseUrl}/status`, { headers })
       );
       this.data.set(response);
     } catch (err: any) {

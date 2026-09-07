@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   imports: [],
-  selector: 'app-homepage',
-  styleUrl: './homepage.css',
-  templateUrl: './homepage.html',
+  selector: 'ResourceView',
+  templateUrl: './ResourceView.component.html',
 })
 export class ResourceView {
-
-
+    metal = input.required<number>();
+    crystal = input.required<number>();
+    deut = input.required<number>();
 }
