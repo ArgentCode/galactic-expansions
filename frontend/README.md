@@ -1,13 +1,13 @@
-# Angular
+# Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.5.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.7.
 
 ## Development server
 
 To start a local development server, run:
 
 ```bash
-yarn start --host 172.17.0.3 // Over whatever IP 
+yarn start --host 172.18.0.3 # replace with container IP
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
