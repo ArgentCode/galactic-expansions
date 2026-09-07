@@ -43,10 +43,13 @@ def upgradeMine():
     mine = data.get('mine')
     idCheck(id)
     player = players.get(id)
+    success = False
     if mine.lower() == "m" or mine.lower() == "metal":
         success = player.metalMine.upgradeInitiate(player)
-    if mine.lower() == "c" or mine.lower() == "crystal":
+    elif mine.lower() == "c" or mine.lower() == "crystal":
         success = player.crystalMine.upgradeInitiate(player)
+    elif mine.lower() == "s" or mine.lower() == "solar":
+        success = player.SolarPlant.upgradeInitiate(player)
     if success:
         return jsonify({
             "status": "Success",
