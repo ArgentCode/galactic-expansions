@@ -6,7 +6,7 @@ import { StatusModel } from '../models/status.interface';
 @Service()
 export class StatusApi {
     private http = inject(HttpClient); // Modern injection syntax (or use constructor)
-    private apiUrl = 'localhost:5000/status';
+    private apiUrl = '/api/status';
 
     // Returns an Observable array of Users
     public getUser(playerId: number): Observable<StatusModel> {

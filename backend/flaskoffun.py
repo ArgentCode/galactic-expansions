@@ -4,8 +4,8 @@ import main
 
 app = Flask(__name__)
 
-CORS(app, origins=["http://localhost:5173",
-     "http://172.17.0.2:5173"], supports_credentials=True)
+CORS(app, origins=["http://localhost:5000",
+     "http://172.17.0.2:5000"], supports_credentials=True)
 
 players = {
     1: main.Player("First Guy", 1),

@@ -1,0 +1,8 @@
+{
+  "/api/**": {
+    "target": "api-container:5000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
