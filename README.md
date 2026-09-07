@@ -2,6 +2,16 @@
 
 A sci-fi idle game!
 
+## General
+
+To spin up this project, simply run `docker compose up`.
+This will create a UI container running on port 4200 (ie `localhost:4200`).
+The API will be served on 5000 ( `localhost:5000` )
+
+The front end should handle most file updates and automatically serve them, but backend changes will require you to rebuild the container.
+
+# Backend 
+
 How to do the game: 
 1. run your virtual environment:
     py -m venv venv
@@ -13,7 +23,7 @@ cd backend
     flask --app .\flaskoffun.py run 
 
 
-Things todo:
+# Things todo:
 1. Break resource tick into its own function
 2. Energy
     - Make energy time dynamic
@@ -26,3 +36,5 @@ Things todo:
 7. login support
 8. Add our images into the game
 9. Add a UI
+
+
