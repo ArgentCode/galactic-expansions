@@ -32,39 +32,48 @@ def tick(player):
     lastTick = player.lastTick
     timeDelta = now - lastTick
     player.lastTick = now
+    energy_bad = player.SolarPlant.energyConsumption < (player.metalMine.energyConsumption + player.crystalMine.energyConsumption)
     minutes = timeDelta.total_seconds()
     # metal
     # if mine is in normal conditions, update materials. Else, upgrade mine and calculate the
     # old and new rates
     if player.metalMine.lastUpgradeTime < lastTick or player.metalMine.lastUpgradeTime > now:
-        player.metal += round(minutes * player.metalMine.rate)
+        player.metal += apply_resource(minutes, player.metalMine.rate, energy_bad)
     else:
         oldRateTime = player.metalMine.lastUpgradeTime - lastTick
         minutes = oldRateTime.total_seconds()
-        player.metal += round(minutes * player.metalMine.rate)
+        player.metal += apply_resource(minutes, player.metalMine.rate, energy_bad)
         player.metalMine.upgradeFinalise(player)
         newRateTime = now - player.metalMine.lastUpgradeTime
         minutes = newRateTime.total_seconds()
-        player.metal += round(minutes * player.metalMine.rate)
+        player.metal += apply_resource(minutes, player.metalMine.rate, energy_bad)
 
     #crystal
     if player.crystalMine.lastUpgradeTime < lastTick or player.crystalMine.lastUpgradeTime > now:
-        player.crystal += round(minutes * player.crystalMine.rate)
+        player.crystal += apply_resource(minutes, player.crystalMine.rate, energy_bad)
     else:
         oldRateTime = player.crystalMine.lastUpgradeTime - lastTick
         minutes = oldRateTime.total_seconds()
-        player.crystal += round(minutes * player.crystalMine.rate)
+        player.crystal += apply_resource(minutes, player.crystalMine.rate, energy_bad)
         player.crystalMine.upgradeFinalise(player)
         newRateTime = now - player.crystalMine.lastUpgradeTime
         minutes = newRateTime.total_seconds()
-        player.crystal += round(minutes * player.crystalMine.rate)
+        player.crystal += apply_resource(minutes, player.crystalMine.rate, energy_bad)
 
     # ships?
 
     print(minutes, " Time has passed")
-    player.crystal += round(minutes * player.crystalMine.rate)
-    player.metal += round(minutes * player.metalMine.rate)
+    player.crystal += apply_resource(minutes, player.crystalMine.rate, energy_bad)
+    player.metal += apply_resource(minutes, player.metalMine.rate, energy_bad)
     # Check upgrades?
+
+def apply_resource(minutes, rate, energy_bad):
+    resource = round(minutes * rate)
+    if energy_bad:
+        return resource * 0.25
+    else: 
+        return resource
+
 
 
 def print_status(player):
@@ -88,11 +97,11 @@ def status(player):
 
 
 class Mine:
-    def __init__(self, rate, level, name):
+    def __init__(self, rate, level, name, energy_mod = 1):
         self.level = level
         self.name = name
         self.rate = rate
-        self.energyConsumption = 5 * self.level
+        self.energyConsumption = 5 * self.level * energy_mod
         self.upgradeMetalCost = 100 * self.level
         self.upgradeCrystalCost = 75 * self.level
         self.upgradeTime = 10 * self.level
@@ -110,7 +119,7 @@ class Mine:
         self.lastUpgradeTime = dt.datetime.now() + dt.timedelta(seconds=self.upgradeTime)
         self.upgradeMetalCost = 100 * self.level
         self.upgradeCrystalCost = 75 * self.level
-        self.energyConsumption = 5 * self.level
+        self.energyConsumption = self.energyConsumption * 1.25
         self.upgradeTime = 10 * self.level
         return True
 
@@ -129,6 +138,11 @@ class CrystalMine(Mine):
         super().__init__(35, 1, "Crystal")
 
 
+class SolarPlant(Mine):
+    def __init__(self, level=1, energy_mod = -2.1):
+        super().__init__(0, 1, "SolarPlant")
+
+
 class Ship:
     def __init__(self, name, hitpoints, armor, damage, type):
         self.name = name
@@ -144,9 +158,10 @@ class Player:
         self.name = name
         self.metalMine = MetalMine()
         self.crystalMine = CrystalMine()
+        self.SolarPlant = SolarPlant()
         self.metal = 1000
         self.crystal = 1000
-        self.energy = 50
+        self.energy = self.SolarPlant.energyConsumption
         self.lastTick = dt.datetime.now()
 
     def __str__(self):
