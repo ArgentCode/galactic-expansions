@@ -39,12 +39,22 @@ def tick(player):
         minutes = newRateTime.total_seconds()
         player.crystal += apply_resource(minutes, player.crystalMine, energy_bad)
 
+    #deuterium
+    #crystal
+    if player.deuteriumMine.lastUpgradeTime < lastTick or player.deuteriumMine.lastUpgradeTime > now:
+        player.crystal += apply_resource(minutes, player.deuteriumMine, energy_bad)
+    else:
+        oldRateTime = player.deuteriumMine.lastUpgradeTime - lastTick
+        minutes = oldRateTime.total_seconds()
+        player.crystal += apply_resource(minutes, player.deuteriumMine, energy_bad)
+        player.deuteriumMine.upgradeFinalise(player)
+        newRateTime = now - player.deuteriumMine.lastUpgradeTime
+        minutes = newRateTime.total_seconds()
+        player.crystal += apply_resource(minutes, player.deuteriumMine, energy_bad)
+
     # ships?
 
     print(minutes, " Time has passed")
-    # player.crystal += apply_resource(minutes, player.crystalMine.rate, energy_bad)
-    # player.metal += apply_resource(minutes, player.metalMine.rate, energy_bad)
-    # Check upgrades?
 
 def apply_resource(minutes, mine, energy_bad):
     resource = round(minutes * mine.rate)
@@ -75,6 +85,7 @@ def status(player):
 
         "metal": player.metal,
         "crystal": player.crystal,
+        "deuterium": player.deuterium,
         "energy": player.energy,
 
         "Metal Mine Level": player.metalMine.level,
@@ -84,6 +95,10 @@ def status(player):
         "Crystal Mine Level": player.crystalMine.level,
         "Crystal Mine Rate": player.crystalMine.rate,
         "Crystal Mine Energy Consumption": player.crystalMine.energyConsumption,
+        
+        "Deuterium Mine Level": player.deuteriumMine.level,
+        "Deuterium Mine Rate": player.deuteriumMine.rate,
+        "Deuterium Mine Energy Consumption": player.deuteriumMine.energyConsumption,
 
         "Solar Plant Level": player.SolarPlant.level,
         "Solar Plant Rate": player.SolarPlant.rate,
@@ -107,7 +122,7 @@ class Mine:
     def upgradeInitiate(self, player):
         if (player.metal < self.upgradeMetalCost
             or player.crystal < self.upgradeCrystalCost
-                or self.lastUpgradeTime > dt.datetime.now()):
+            or self.lastUpgradeTime > dt.datetime.now()):
             return False
         player.metal -= self.upgradeMetalCost
         player.crystal -= self.upgradeCrystalCost
@@ -136,6 +151,11 @@ class CrystalMine(Mine):
         super().__init__(35, 1, "Crystal")
 
 
+class DeuteriumMine(Mine):
+    def __init__(self):
+        super().__init__(25, 1, "Deuterium")
+
+
 class SolarPlant(Mine):
     def __init__(self, energy_mod = -2.1):
         super().__init__(0, 1, "SolarPlant", energy_mod)
@@ -156,9 +176,11 @@ class Player:
         self.name = name
         self.metalMine = MetalMine()
         self.crystalMine = CrystalMine()
+        self.deuteriumMine = DeuteriumMine()
         self.SolarPlant = SolarPlant()
         self.metal = 1000
-        self.crystal = 1000
+        self.crystal = 750
+        self.deuterium = 500
         self.energy = 0.5
         self.lastTick = dt.datetime.now()
 
