@@ -39,11 +39,13 @@ How to do the game:
 # Databases Idea
 Tables:
     Player:
-        PlayerID, Name, List of Worlds
+        PlayerID, Name, last tick, List of Worlds
     Research:
         PlayerID, one column for each research (12 or something)
     Worlds:
-        WorldID, PlayerID, Name, Mines, Buildings, resources (This would be many columns)
+        WorldID, PlayerID, Name, resources (This would be many columns)
+    Buildings:
+        Mines, facilities
     fleets:
         PlayerID, WorldID (Set 0 to traveling or something?), departure, arrival,  
 

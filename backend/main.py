@@ -142,18 +142,18 @@ class Mine:
 
 
 class MetalMine(Mine):
-    def __init__(self):
-        super().__init__(50, 1, "Metal")
+    def __init__(self, energy_mod=1):
+        super().__init__(50, 1, "Metal", energy_mod)
 
 
 class CrystalMine(Mine):
-    def __init__(self):
-        super().__init__(35, 1, "Crystal")
+    def __init__(self, energy_mod = 1.2):
+        super().__init__(35, 1, "Crystal", energy_mod)
 
 
 class DeuteriumMine(Mine):
-    def __init__(self):
-        super().__init__(25, 1, "Deuterium")
+    def __init__(self, energy_mod = 1.5):
+        super().__init__(25, 1, "Deuterium", energy_mod)
 
 
 class SolarPlant(Mine):
