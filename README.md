@@ -1,6 +1,6 @@
 # galactic-expansions
 
-A sci-fi idle game!
+A sci-fi timer based slow build up strategy game!
 
 ## General
 
@@ -19,7 +19,7 @@ How to do the game:
 2. install packages 
     pip install -r .\requirements.txt
 3. Go to backend and Run flask
-cd backend
+    cd backend
     flask --app .\flaskoffun.py run 
 
 
@@ -27,14 +27,24 @@ cd backend
 1. Break resource tick into its own function
 2. Energy
     - Make energy time dynamic
-3. Oil
-4. fix my mega if statements in the tick
-5. Fix the timing for upgrades
+3. fix my mega if statements in the tick
+4. Fix the timing for upgrades
     if player.metalMine.lastUpgradeTime < lastTick or player.metalMine.lastUpgradeTime > now:
     this line actually only does the upgrade if the last tick did the thing. Behind, bad, yeah.
-6. Database support for persistence
-7. login support
-8. Add our images into the game
-9. Add a UI
+5. Database support for persistence
+6. login support
+7. Add our images into the game
+8. Add a UI
 
+# Databases Idea
+Tables:
+    Player:
+        PlayerID, Name, List of Worlds
+    Research:
+        PlayerID, one column for each research (12 or something)
+    Worlds:
+        WorldID, PlayerID, Name, Mines, Buildings, resources (This would be many columns)
+    fleets:
+        PlayerID, WorldID (Set 0 to traveling or something?), departure, arrival,  
 
+    
