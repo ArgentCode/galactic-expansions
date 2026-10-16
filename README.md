@@ -24,6 +24,13 @@ How to do the game:
 
 
 # Things todo:
+- redesign our API calls to hit the db instead of memory
+- rebuild the tick function
+- redo the inheritance structure
+- figure out how to load database into memory
+- decide on product amounts
+- storage for resources
+- research?
 1. Break resource tick into its own function
 2. Energy
     - Make energy time dynamic
@@ -43,7 +50,7 @@ Tables:
     Research:
         PlayerID, one column for each research (12 or something)
     Worlds:
-        WorldID, PlayerID, Name, resources (This would be many columns)
+        WorldID, PlayerID, Name, resources
     Buildings:
         Mines, facilities
     fleets:
