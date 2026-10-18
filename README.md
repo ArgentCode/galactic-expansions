@@ -31,6 +31,7 @@ How to do the game:
 - decide on product amounts
 - storage for resources
 - research?
+- unit
 1. Break resource tick into its own function
 2. Energy
     - Make energy time dynamic
