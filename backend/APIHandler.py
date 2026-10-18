@@ -103,11 +103,11 @@ def new_player():
         session.close()
 
 
-@app.route('/player/remove', methods=["POST"])
+@app.route('/player/remove', methods=["DELETE"])
 def remove_player():
     session = SessionLocal()
     player_id = request.headers.get('player-id', type=int)
-    admin_id = request.headers.get('player-id', type=int)
+    admin_id = request.headers.get('admin-id', type=int)
 
     try:
         if not player_id or not admin_id:
@@ -115,6 +115,8 @@ def remove_player():
         player = session.query(Player).filter_by(player_id=player_id).first()
         if not player:
             return jsonify({"error": "Player not found"}), 404
+        if admin_id != 123:
+            return jsonify({"error": "Access Denied"}), 403
         empire_name = player.empire_name
 
         session.delete(player)

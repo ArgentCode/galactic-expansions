@@ -22,27 +22,20 @@ How to do the game:
     cd backend
     flask --app .\flaskoffun.py run 
 
-
 # Things todo:
-- redesign our API calls to hit the db instead of memory
-- rebuild the tick function
-- redo the inheritance structure
-- figure out how to load database into memory
-- decide on product amounts
-- storage for resources
-- research?
-- unit
-1. Break resource tick into its own function
-2. Energy
-    - Make energy time dynamic
-3. fix my mega if statements in the tick
-4. Fix the timing for upgrades
-    if player.metalMine.lastUpgradeTime < lastTick or player.metalMine.lastUpgradeTime > now:
-    this line actually only does the upgrade if the last tick did the thing. Behind, bad, yeah.
-5. Database support for persistence
-6. login support
-7. Add our images into the game
-8. Add a UI
+- Backend
+    1. Tick function
+    2. Upgrade mines
+    3. Facilities
+    4. Research
+    5. ships
+        - transport
+        - Expeditions
+        - combat
+- Front End
+    1. login support
+    2. Add our images into the game
+    3. Add a UI
 
 # Databases Idea
 Tables:
@@ -56,5 +49,3 @@ Tables:
         Mines, facilities
     fleets:
         PlayerID, WorldID (Set 0 to traveling or something?), departure, arrival,  
-
-    
