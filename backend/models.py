@@ -25,6 +25,7 @@ class Player(Base):
     tech_laser = Column(Integer)
     tech_ion = Column(Integer)
     tech_plasma = Column(Integer)
+
     last_tick = Column(TIMESTAMP)
 
     worlds = relationship(
@@ -62,5 +63,7 @@ class Buildings(Base):
 
     level = Column(Integer, default=0)
     building_type = Column(String)
+
+    completion_time = Column(TIMESTAMP)
 
     world = relationship("Worlds", back_populates="buildings")

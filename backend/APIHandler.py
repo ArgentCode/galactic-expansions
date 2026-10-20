@@ -1,4 +1,4 @@
-import time
+import datetime as dt
 from database import SessionLocal
 from flask import Flask, jsonify, request
 from models import Buildings, Player, Worlds
@@ -24,11 +24,9 @@ def player_status():
         if not player:
             return jsonify({"error": "Player not found"}), 404
 
-        current_time = int(time.time())
-        # player_tick(player)
-        json_status = get_player_status(player)
-        # TODO: Tick the player
-        session.commit()  # 5. Return success JSON
+        current_time = dt.datetime.now()
+        json_status = get_player_status(current_time, player)
+        session.commit()
         return (json_status, 200)
 
     except Exception as e:
@@ -48,14 +46,18 @@ def world_status():
         if not player_id or not world_id:
             return jsonify({"error": "Missing player-id or world-id header"}), 400
 
+        player = session.query(Player).filter_by(player_id=player_id).first()
+        if not player:
+            return jsonify({"error": "Player not found"}), 404
+
         world = session.query(Worlds).filter_by(
             player_id=player_id, world_id=world_id).first()
         if not world:
             return jsonify({"error": "World not found"}), 404
 
-        current_time = int(time.time())
+        current_time = dt.datetime.now()
         # player_tick(player)
-        json_status = get_world_status(world)
+        json_status = get_world_status(current_time, player, world)
         # TODO: Tick the player
         session.commit()  # 5. Return success JSON
         return (json_status, 200)
@@ -133,6 +135,33 @@ def remove_player():
             ),
             200,
         )
+
+    except Exception as e:
+        session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        session.close()
+
+
+# Helper function for game dev purposes
+@app.route('/player/dump', methods=['GET'])
+def dump_player():
+    session = SessionLocal()
+    try:
+        players = session.query(Player).all()
+
+        player_list = []
+        for player in players:
+            player_list.append({
+                "player_id": player.player_id,
+                "empire_name": player.empire_name,
+                "last_tick": str(
+                    player.last_tick
+                ),
+            })
+
+        return jsonify({"success": True, "count": len(player_list), "players": player_list}), 200
 
     except Exception as e:
         session.rollback()
