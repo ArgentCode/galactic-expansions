@@ -47,7 +47,7 @@ def create_new_world(session, player_id: int) -> Worlds:
     current_time = dt.datetime.now()
     initial_buildings = [
         Buildings(
-            world_id=new_world.world_id, building_type="metal_mine", level=1, completion_time=current_time
+            world_id=new_world.world_id, building_type="metal_mine", level=1, completion_time=None
         ),
         Buildings(
             world_id=new_world.world_id, building_type="crystal_mine", level=0, completion_time=None
@@ -56,7 +56,7 @@ def create_new_world(session, player_id: int) -> Worlds:
             world_id=new_world.world_id, building_type="deuterium_mine", level=0, completion_time=None
         ),
         Buildings(
-            world_id=new_world.world_id, building_type="solar_plant", level=1, completion_time=current_time
+            world_id=new_world.world_id, building_type="solar_plant", level=1, completion_time=None
         ),
     ]
     session.add_all(initial_buildings)
@@ -143,6 +143,7 @@ def player_tick(current_tick: dt.datetime, player: Player) -> None:
                     "type": "building_upgrade",
                     "target": building,
                     "world": world,
+                    "player": player
                 })
 
     event_queue.sort(key=lambda x: x["timestamp"])
@@ -152,12 +153,70 @@ def player_tick(current_tick: dt.datetime, player: Player) -> None:
         "type": "current_tick",
         "target": None,
         "world": None,
+        "player": None
     })
 
     print("looping event queue")
     for event in event_queue:
         # calculate resources, then do the upgrade.
         resource_tick(event["timestamp"], player)
+        event_handler(event)
+        player.last_tick = event["timestamp"]
+
+
+def building_upgrade(event) -> None:
+    building = event["target"]
+    building.level += 1
+
+
+def event_handler(event) -> None:
+    print("Starting event handler")
+    if event["type"] == "current_tick":
+        pass
+    if event["type"] == "building_upgrade":
+        building_upgrade(event)
+
+
+def initiate_building_upgrade(world: Worlds, building: Buildings):
+    config = BUILDING_CONFIGS[building.building_type]
+    if (world.metal < config["metal_cost"]
+        or world.crystal < config["crystal_cost"]
+        or world.deuterium < config["deuterium_cost"]):
+        return (
+            jsonify({
+                "success": False,
+                "Report": "Failure, not enough resources.",
+            }),
+            400,
+        )
+    elif (building.completion_time > dt.datetime.now()):
+        return (
+            jsonify({
+                "success": False,
+                "Report": "Failure, upgrade already in progress.",
+            }),
+            400,
+        )
+
+    world.metal -= config["metal_cost"]
+    world.crystal -= config["crystal_cost"]
+    world.deuterium -= config["deuterium_cost"]
+    base_time = config["upgrade_time"]
+    upgrade_seconds = base_time * (1.5 ** building.level)
+    building.completion_time = dt.datetime.now() + dt.timedelta(
+        seconds=upgrade_seconds
+    )
+    time_str = building.completion_time.strftime("%Y-%m-%d %H:%M:%S")
+    return (
+        jsonify({
+            "success": True,
+            "Report": (
+                f"Your {building.building_type} upgrade will complete at"
+                f" {time_str}"
+            ),
+        }),
+        200,
+    )
 
 
 def resource_tick(current_tick: dt.datetime, player: Player) -> None:
@@ -169,7 +228,7 @@ def resource_tick(current_tick: dt.datetime, player: Player) -> None:
         deuterium_production = 0
         for building in world.buildings:
             if building.building_type == "metal_mine" and building.level > 0:
-                config = MINE_CONFIGS['metal_mine']
+                config = BUILDING_CONFIGS['metal_mine']
 
                 production = (
                     config["base_production"]
@@ -179,7 +238,7 @@ def resource_tick(current_tick: dt.datetime, player: Player) -> None:
                 metal_production += production
 
             elif building.building_type == "crystal_mine" and building.level > 0:
-                config = MINE_CONFIGS['crystal_mine']
+                config = BUILDING_CONFIGS['crystal_mine']
 
                 production = (
                     config["base_production"]
@@ -189,7 +248,7 @@ def resource_tick(current_tick: dt.datetime, player: Player) -> None:
                 crystal_production += production
 
             elif building.building_type == "deuterium_mine" and building.level > 0:
-                config = MINE_CONFIGS['deuterium_mine']
+                config = BUILDING_CONFIGS['deuterium_mine']
 
                 production = (
                     config["base_production"]

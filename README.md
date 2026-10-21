@@ -18,20 +18,26 @@ How to do the game:
     .\venv\Scripts\activate.ps1   
 2. install packages 
     pip install -r .\requirements.txt
-3. Go to backend and Run flask
+3. Go to backend
     cd backend
+4. Test DB connection
+    python .\test_db.py (my comically terrible testing)
+5. Run flask
     flask --app .\flaskoffun.py run 
+6. Fire up your API caller of choice (Bruno used in testing)
+    Review APIHandler specific instructions!
 
 # Things todo:
 - Backend
-    1. Tick function
-    2. Upgrade mines
-    3. Facilities
-    4. Research
-    5. ships
+    1. Upgrade mines
+        - make sure you check energy in the tick function after!
+    2. Facilities
+    3. Research
+    4. ships
         - transport
         - Expeditions
         - combat
+    5. unit tests
 - Front End
     1. login support
     2. Add our images into the game

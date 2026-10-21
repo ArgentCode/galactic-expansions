@@ -70,6 +70,50 @@ def world_status():
         session.close()
 
 
+@app.route('/building/upgrade', methods=["POST"])
+def upgrade_building():
+    session = SessionLocal()
+    player_id = request.headers.get('player-id', type=int)
+    world_id = request.headers.get('world-id', type=int)
+    building_type = request.headers.get('building-type', type=str)
+    try:
+        if not player_id or not world_id or not building_type:
+            return jsonify({"error": "Missing player-id or world-id or building-type header"}), 400
+
+        player = session.query(Player).filter_by(player_id=player_id).first()
+        if not player:
+            return jsonify({"error": "Player not found"}), 404
+
+        world = session.query(Worlds).filter_by(
+            player_id=player_id, world_id=world_id).first()
+        if not world:
+            return jsonify({"error": "World not found"}), 404
+
+        # the worlds_building is a list. Might be able to make this easier
+        # if we had actual building_ids associated with the buttons
+        # on our theoretical webpage.
+        building = next(
+                (b for b in world.buildings if b.building_type == building_type), None
+            )
+        if not building:
+            return jsonify({"error": "building not found"}), 404
+
+        json_status, code = initiate_building_upgrade(world, building)
+        if code == 200:
+            session.commit()
+        else:
+            session.rollback() # if not enough resources
+
+        return json_status, code
+
+    except Exception as e:
+        session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        session.close()
+
+
 @app.route('/player/create', methods=["POST"])
 def new_player():
     session = SessionLocal()
