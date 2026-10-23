@@ -58,6 +58,15 @@ def create_new_world(session, player_id: int) -> Worlds:
         Buildings(
             world_id=new_world.world_id, building_type="solar_plant", level=1, completion_time=None
         ),
+        Buildings(
+            world_id=new_world.world_id, building_type="robotics_facility", level=0, completion_time=None
+        ),
+        Buildings(
+            world_id=new_world.world_id, building_type="research_lab", level=0, completion_time=None
+        ),
+        Buildings(
+            world_id=new_world.world_id, building_type="shipyard", level=0, completion_time=None
+        ),
     ]
     session.add_all(initial_buildings)
     session.flush()
@@ -167,6 +176,22 @@ def player_tick(current_tick: dt.datetime, player: Player) -> None:
 def building_upgrade(event) -> None:
     building = event["target"]
     building.level += 1
+    recalculate_energy(event["world"])
+
+
+def recalculate_energy(world: Worlds) -> None:
+    """
+    reminder that energy producing buildings have a negative consumption for easy handling
+    """
+    energy = 0
+    for building in world.buildings:
+        config = BUILDING_CONFIGS[building.building_type]
+        energy += (building.level
+                   * config["energy_consumption"]
+                   * building.level
+                   * (1.1 ** building.level)
+                   )
+    world.energy = -1 * round(energy) # Double flipping signs seems silly...solar plant gives, everytrhing else takes!
 
 
 def event_handler(event) -> None:
@@ -181,7 +206,7 @@ def initiate_building_upgrade(world: Worlds, building: Buildings):
     config = BUILDING_CONFIGS[building.building_type]
     if (world.metal < config["metal_cost"]
         or world.crystal < config["crystal_cost"]
-        or world.deuterium < config["deuterium_cost"]):
+            or world.deuterium < config["deuterium_cost"]):
         return (
             jsonify({
                 "success": False,
@@ -189,7 +214,8 @@ def initiate_building_upgrade(world: Worlds, building: Buildings):
             }),
             400,
         )
-    elif (building.completion_time > dt.datetime.now()):
+    elif (building.completion_time is not None
+            and building.completion_time > dt.datetime.now()):
         return (
             jsonify({
                 "success": False,
@@ -197,12 +223,21 @@ def initiate_building_upgrade(world: Worlds, building: Buildings):
             }),
             400,
         )
+    
+    robotics_bay = next(
+        (b for b in world.buildings if b.building_type == "robotics_facility"),
+        None,
+    )
+    robot_level = robotics_bay.level if robotics_bay else 0
+    
+    robot_config = BUILDING_CONFIGS[robotics_bay.building_type]
+    production_increase = (robot_config["multiplier"] ** robot_level)
 
     world.metal -= config["metal_cost"]
     world.crystal -= config["crystal_cost"]
     world.deuterium -= config["deuterium_cost"]
     base_time = config["upgrade_time"]
-    upgrade_seconds = base_time * (1.5 ** building.level)
+    upgrade_seconds = round(base_time * (1.5 ** building.level) * production_increase)
     building.completion_time = dt.datetime.now() + dt.timedelta(
         seconds=upgrade_seconds
     )
@@ -261,6 +296,6 @@ def resource_tick(current_tick: dt.datetime, player: Player) -> None:
             crystal_production *= 0.25
             deuterium_production *= 0.25
 
-        world.metal += metal_production
-        world.crystal += crystal_production
-        world.deuterium += deuterium_production
+        world.metal = round(world.metal + metal_production)
+        world.crystal = round(crystal_production + world.crystal)
+        world.deuterium = round(deuterium_production + world.deuterium)

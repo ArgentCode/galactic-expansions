@@ -29,15 +29,16 @@ How to do the game:
 
 # Things todo:
 - Backend
-    1. Upgrade mines
-        - make sure you check energy in the tick function after!
-    2. Facilities
-    3. Research
-    4. ships
+    1. Facilities
+        - robotics facility
+        - research lab
+        - shipyard
+    2. Research
+    3. ships
         - transport
         - Expeditions
         - combat
-    5. unit tests
+    4. unit tests
 - Front End
     1. login support
     2. Add our images into the game
